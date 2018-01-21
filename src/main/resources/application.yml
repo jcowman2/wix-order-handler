@@ -1,0 +1,9 @@
+client:
+  secret:
+    path: ${CLIENT_SECRET_PATH}
+
+spring:
+  application:
+    name: Pupcycle Wix Order Handler
+  profiles:
+    active: default
