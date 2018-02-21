@@ -17,9 +17,18 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
+/**
+ * Contains all configuration necessary to build and return an authorized Gmail service.
+ *
+ * @author Joe Cowman
+ */
 @Configuration
 @CompileStatic
 class GmailConfig {
+
+    private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance()
+
+    private final List<String> SCOPES = Arrays.asList(GmailScopes.GMAIL_LABELS) //If modified, delete previous credentials
 
     @Value('${spring.application.name}')
     private String APPLICATION_NAME
@@ -30,23 +39,63 @@ class GmailConfig {
     @Value('${client.credential.path')
     public final String credentialPath
 
-    private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance()
+    @Value('${server.port}')
+    public final int port
 
-    private final List<String> SCOPES = Arrays.asList(GmailScopes.GMAIL_LABELS) //If modified, delete previous credentials
-
+    /**
+     * Returns Google's HTTP Transport
+     * @return HTTP Transport
+     */
     @Bean
     HttpTransport httpTransport() {
         return GoogleNetHttpTransport.newTrustedTransport()
     }
 
+    /**
+     * Returns the credential file.
+     * @return the credential file.
+     */
     @Bean
     File dataStoreDir() {
         return new File(credentialPath)
     }
 
+    /**
+     * Creates a FileDataStoreFactory for the given data store directory.
+     * @return the FileDataStoreFactory
+     */
     @Bean
     FileDataStoreFactory fileDataStoreFactory() {
         return new FileDataStoreFactory(dataStoreDir())
+    }
+
+    /**
+     * Creates an authorized Credential object.
+     * @return an authorized Credential object.
+     * @throws IOException
+     */
+    @Bean
+    Credential authorize() throws IOException {
+        // Load client secrets.
+        InputStream inputStream = new FileInputStream(clientSecretPath)
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(inputStream))
+
+        // Build flow and trigger user authorization request.
+        GoogleAuthorizationCodeFlow flow =
+                new GoogleAuthorizationCodeFlow.Builder(
+                        httpTransport(), JSON_FACTORY, clientSecrets, SCOPES)
+                        .setDataStoreFactory(fileDataStoreFactory())
+                        .setAccessType("offline")
+                        .build()
+
+        // Retrieve access token.
+        Credential credential = new AuthorizationCodeInstalledApp(flow,
+                new LocalServerReceiver.Builder().setPort(port).build())
+                .authorize("user")
+
+        System.out.println("Credentials saved to " + dataStoreDir().getAbsolutePath())
+
+        return credential
     }
 
     /**
@@ -62,27 +111,4 @@ class GmailConfig {
                 .build()
     }
 
-    /**
-     * Creates an authorized Credential object.
-     * @return an authorized Credential object.
-     * @throws IOException
-     */
-    Credential authorize() throws IOException {
-        // Load client secrets.
-        InputStream inputStream = new FileInputStream(clientSecretPath)
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(inputStream))
-
-        // Build flow and trigger user authorization request.
-        GoogleAuthorizationCodeFlow flow =
-                new GoogleAuthorizationCodeFlow.Builder(
-                        httpTransport(), JSON_FACTORY, clientSecrets, SCOPES)
-                        .setDataStoreFactory(fileDataStoreFactory())
-                        .setAccessType("offline")
-                        .build()
-        Credential credential = new AuthorizationCodeInstalledApp(flow,
-                new LocalServerReceiver.Builder().setPort(8091).build())
-                .authorize("user")
-        System.out.println("Credentials saved to " + dataStoreDir().getAbsolutePath())
-        return credential
-    }
 }
