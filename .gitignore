@@ -16,5 +16,5 @@
 *.iml
 *.ipr
 
-client_secret.json
+client_secret*
 StoredCredential

@@ -32,34 +32,7 @@ class GmailConfig {
 
     private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance()
 
-    /** Directory to store user credentials for this application. */
-//    private static final File DATA_STORE_DIR = new File(System.getProperty("user.home"), ".credentials/gmail-java-quickstart")
-//    private final File DATA_STORE_DIR = new File(credentialPath)
-
-    /** Global instance of the {@link com.google.api.client.util.store.FileDataStoreFactory}. */
-//    private FileDataStoreFactory DATA_STORE_FACTORY
-
-    /** Global instance of the JSON factory. */
-//    private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance()
-
-    /** Global instance of the HTTP transport. */
-//    private HttpTransport HTTP_TRANSPORT
-
-    /** Global instance of the scopes required by this quickstart.
-     *
-     * If modifying these scopes, delete your previously saved credentials.
-     */
-    private final List<String> SCOPES = Arrays.asList(GmailScopes.GMAIL_LABELS)
-
-//    static {
-//        try {
-//            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport()
-//            DATA_STORE_FACTORY = new FileDataStoreFactory(DATA_STORE_DIR)
-//        } catch (Throwable t) {
-//            t.printStackTrace()
-//            System.exit(1)
-//        }
-//    }
+    private final List<String> SCOPES = Arrays.asList(GmailScopes.GMAIL_LABELS) //If modified, delete previous credentials
 
     @Bean
     HttpTransport httpTransport() {
@@ -84,7 +57,6 @@ class GmailConfig {
     @Bean
     Gmail getGmailService() throws IOException {
         Credential credential = authorize()
-//        return new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
         return new Gmail.Builder(httpTransport(), JSON_FACTORY, credential)
                 .setApplicationName(APPLICATION_NAME)
                 .build()
@@ -103,15 +75,14 @@ class GmailConfig {
         // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow =
                 new GoogleAuthorizationCodeFlow.Builder(
-//                        HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
                         httpTransport(), JSON_FACTORY, clientSecrets, SCOPES)
-//                        .setDataStoreFactory(DATA_STORE_FACTORY)
                         .setDataStoreFactory(fileDataStoreFactory())
                         .setAccessType("offline")
                         .build()
-        Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user")
+        Credential credential = new AuthorizationCodeInstalledApp(flow,
+                new LocalServerReceiver.Builder().setPort(8091).build())
+                .authorize("user")
         System.out.println("Credentials saved to " + dataStoreDir().getAbsolutePath())
-//        System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath())
         return credential
     }
 }
