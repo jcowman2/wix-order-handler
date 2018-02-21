@@ -1,9 +1,14 @@
 client:
   secret:
     path: ${CLIENT_SECRET_PATH}
+  credential:
+    path: ${STORED_CREDENTIAL_PATH}
 
 spring:
   application:
     name: Pupcycle Wix Order Handler
   profiles:
     active: default
+
+server:
+  port: 8090
