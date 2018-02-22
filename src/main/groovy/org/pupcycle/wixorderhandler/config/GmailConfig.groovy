@@ -36,7 +36,7 @@ class GmailConfig {
     @Value('${client.secret.path}')
     private String clientSecretPath
 
-    @Value('${client.credential.path')
+    @Value('${client.credential.path}')
     public final String credentialPath
 
     @Value('${server.port}')
