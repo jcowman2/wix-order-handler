@@ -28,19 +28,19 @@ class GmailConfig {
 
     private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance()
 
-    private final List<String> SCOPES = Arrays.asList(GmailScopes.GMAIL_LABELS) //If modified, delete previous credentials
+    private final List<String> SCOPES = Arrays.asList(GmailScopes.GMAIL_LABELS, GmailScopes.GMAIL_READONLY) //If modified, delete previous credentials
 
     @Value('${spring.application.name}')
-    private String APPLICATION_NAME
+    private String applicationName
 
     @Value('${client.secret.path}')
     private String clientSecretPath
 
     @Value('${client.credential.path}')
-    public final String credentialPath
+    private String credentialPath
 
     @Value('${server.port}')
-    public final int port
+    private int port
 
     /**
      * Returns Google's HTTP Transport
@@ -107,7 +107,7 @@ class GmailConfig {
     Gmail getGmailService() throws IOException {
         Credential credential = authorize()
         return new Gmail.Builder(httpTransport(), JSON_FACTORY, credential)
-                .setApplicationName(APPLICATION_NAME)
+                .setApplicationName(applicationName)
                 .build()
     }
 

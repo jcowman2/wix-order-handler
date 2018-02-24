@@ -1,13 +1,13 @@
 package org.pupcycle.wixorderhandler
 
 import com.google.api.services.gmail.Gmail
+import com.google.api.services.gmail.model.ListMessagesResponse
+import com.google.api.services.gmail.model.Message
 import groovy.transform.CompileStatic
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-
 
 /**
  * Methods to manage notification and email sync with Gmail.
@@ -24,11 +24,31 @@ class GmailSyncManager {
     Gmail gmailService
 
     /**
-     * Submits Watch request to Google Cloud Pub/Sub Gmail topic.
-     * Runs on startup, and then again every 24 hours.
+     * Retrieves all emails in the user's account.
+     * @return A list of all messages, from newest to oldest
      */
-    @Scheduled(initialDelay = 0L, fixedRate = 3000L) //placeholder, tests every 3 seconds
-    void submitWatchRequest() {
-        LOG.info("Watch request submitted.")
+    List<Message> fullSync() {
+
+        LOG.info("Attempting full synchronization of user messages.")
+
+        Gmail.Users.Messages.List listRequest = gmailService.users().messages().list("me")
+        ListMessagesResponse response = listRequest.execute()
+        List<Message> messages = []
+
+        while (response.getMessages()) {
+            messages += response.getMessages()
+
+            if (response.getNextPageToken()) {
+                String pageToken = response.getNextPageToken()
+                response = listRequest.setPageToken(pageToken).execute()
+            } else {
+                break
+            }
+        }
+
+        LOG.info("Synchronized user messages. Retrieved ${messages.size()} messages. Most recent id: ${messages.first().getId()}")
+
+        return messages
     }
+
 }
