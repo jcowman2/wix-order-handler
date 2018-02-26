@@ -27,7 +27,8 @@ class OrderHandlerRunner implements CommandLineRunner {
     void run(String... args) throws Exception {
         LOG.info("OrderHandlerRunner started successfully.")
 
-        syncManager.fullSync()
+        //syncManager.getMessage(syncManager.fullSync().first().getId())
+        syncManager.getMessage(syncManager.getMostRecentMessageId())
     }
 
 }
