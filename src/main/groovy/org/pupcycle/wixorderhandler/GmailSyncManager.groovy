@@ -1,6 +1,7 @@
 package org.pupcycle.wixorderhandler
 
 import com.google.api.services.gmail.Gmail
+import com.google.api.services.gmail.model.ListHistoryResponse
 import com.google.api.services.gmail.model.ListMessagesResponse
 import com.google.api.services.gmail.model.Message
 import groovy.transform.CompileStatic
@@ -71,6 +72,35 @@ class GmailSyncManager {
         Message message = gmailService.users().messages().get("me", id).execute()
         LOG.info("Retrieved message with {id: ${message.getId()}, historyId: ${message.getHistoryId()}}.")
         return message
+    }
+
+    List<Message> getMessagesAddedSinceHistoryId(String historyId) {
+        LOG.info("Attempting partial synchronization of user messages since {historyId: $historyId}.")
+
+        Gmail.Users.History.List listRequest = gmailService.users().history().list("me")
+                .setHistoryTypes(["messageAdded"]).setStartHistoryId(historyId as BigInteger)
+        ListHistoryResponse response = listRequest.execute()
+        List<Message> messages = []
+
+        while (response.getHistory()) {
+            response.getHistory().each { h ->
+                messages += h.getMessages()
+            }
+
+            if (response.getNextPageToken()) {
+                String pageToken = response.getNextPageToken()
+                response = listRequest.setPageToken(pageToken).execute()
+            } else {
+                break
+            }
+        }
+
+        LOG.info("Synchronized user messages. Returned {count: ${messages.size()}} messages.")
+
+        messages = messages.collect { getMessage(it.getId()) }
+
+        return messages
+
     }
 
 }
