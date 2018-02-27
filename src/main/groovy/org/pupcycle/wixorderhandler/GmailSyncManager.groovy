@@ -25,6 +25,18 @@ class GmailSyncManager {
     Gmail gmailService
 
     /**
+     * Gets a single message from the Gmail account by the message's id. This method is
+     * required because the messages returned by {@code messages.list} don't contain a historyId.
+     * @param id    the message id
+     * @return the message resource
+     */
+    Message getMessage(String id) {
+        Message message = gmailService.users().messages().get("me", id).execute()
+        LOG.info("Retrieved message with {id: ${message.getId()}, historyId: ${message.getHistoryId()}}.")
+        return message
+    }
+
+    /**
      * Gets the id of the most recently received message in the Gmail inbox.
      * @return the message id
      */
@@ -36,15 +48,11 @@ class GmailSyncManager {
     }
 
     /**
-     * Gets a single message from the Gmail account by the message's id. This method is
-     * required because the messages returned by {@code messages.list} don't contain a historyId.
-     * @param id    the message id
-     * @return the message resource
+     * Gets the history id of the most recently received message in the Gmail inbox.
+     * @return the history id
      */
-    Message getMessage(String id) {
-        Message message = gmailService.users().messages().get("me", id).execute()
-        LOG.info("Retrieved message with {id: ${message.getId()}, historyId: ${message.getHistoryId()}}.")
-        return message
+    String getMostRecentHistoryId() {
+        return getMessage(getMostRecentMessageId()).getHistoryId()
     }
 
     /**
