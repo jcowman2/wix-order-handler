@@ -24,15 +24,16 @@ repositories {
 	mavenCentral()
 }
 
-
 ext {
 	springCloudVersion = 'Edgware.RELEASE'
 }
 
 dependencies {
+	compile 'org.codehaus.groovy:groovy'
+	compile 'org.codehaus.groovy:groovy-json'
+
 	compile 'org.springframework.cloud:spring-cloud-starter-feign'
 	compile 'org.springframework.boot:spring-boot-starter-web'
-	compile 'org.codehaus.groovy:groovy'
 
     compile 'com.google.api-client:google-api-client:1.23.0'
     compile 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
