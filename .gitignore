@@ -15,3 +15,7 @@
 *.iws
 *.iml
 *.ipr
+
+client_secret*
+StoredCredential
+history
