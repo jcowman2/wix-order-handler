@@ -32,7 +32,7 @@ class GmailAccessor {
      */
     Message getMessage(String id) {
         Message message = gmailService.users().messages().get("me", id).execute()
-        LOG.info("Retrieved message with {id: ${message.getId()}, historyId: ${message.getHistoryId()}}.")
+        LOG.debug("Retrieved message with {id: ${message.getId()}, historyId: ${message.getHistoryId()}}.")
         return message
     }
 
