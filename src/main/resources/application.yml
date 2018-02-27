@@ -17,3 +17,6 @@ logging:
   level:
     org.springframework.web: INFO
     org.hibernate: ERROR
+
+history:
+  path: ${HISTORY_PATH}

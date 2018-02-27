@@ -1,7 +1,6 @@
 package org.pupcycle.wixorderhandler
 
 import com.google.api.services.gmail.Gmail
-import com.google.api.services.gmail.model.Message
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,6 +23,9 @@ class OrderHandlerRunner implements CommandLineRunner {
     @Autowired
     GmailSyncManager syncManager
 
+    @Autowired
+    HistoryManager historyManager
+
     @Override
     void run(String... args) throws Exception {
         LOG.info("OrderHandlerRunner started successfully.")
@@ -32,7 +34,8 @@ class OrderHandlerRunner implements CommandLineRunner {
 //        String historyId = syncManager.getMessage(messageId).getHistoryId()
         String historyId = "822440"
 
-        List<Message> m = syncManager.getMessagesAddedSinceHistoryId(historyId)
+//        List<Message> m = syncManager.getMessagesAddedSinceHistoryId(historyId)
+        System.out.println(historyManager.getHistoryFileAccessor().getHistoryIfExists())
     }
 
 }
