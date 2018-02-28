@@ -5,7 +5,6 @@ import org.pupcycle.wixorderhandler.accessor.GmailAccessor
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
 /**
@@ -38,7 +37,7 @@ class GmailSyncManager {
         List<Message> messages = gmailAccessor.getMessagesAddedSinceHistoryId(historyId)
 
         if (messages) {
-            historyManager.setSavedHistoryId(messages.last().getHistoryId().toString())
+//            historyManager.setSavedHistoryId(messages.last().getHistoryId().toString())
         }
 
         return messages
@@ -48,10 +47,10 @@ class GmailSyncManager {
      * Syncs new messages on startup and every 10 seconds after.
      * Will eventually be moved into its own class.
      */
-    @Scheduled(initialDelay = 0L, fixedRate = 10000L)
+    //@Scheduled(initialDelay = 0L, fixedRate = 10000L)
     void scheduledSync() {
         LOG.info("Performing scheduled sync.")
-        getNewMessages()
+        getNewMessages().each{EmailParser.parseEmail(it)}
     }
 
 }
