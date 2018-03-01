@@ -21,7 +21,7 @@ class HistoryFileAccessor {
      *
      * @return an optional with the contents of the file, if present
      */
-    Optional<String> getHistoryIfExists() {
+    Optional<String> getSavedHistoryId() {
         File f = new File(historyFilePath)
         return f.createNewFile() ? Optional.empty() : Optional.of(f.text).filter{!!it}
     }
@@ -30,10 +30,10 @@ class HistoryFileAccessor {
      * Records the value to the history file.
      * Will attempt to generate the file if it does not exist, but not guaranteed.
      *
-     * @param value     the value to be recorded
+     * @param id     the value to be recorded
      */
-    void writeValue(String value) {
-        new File(historyFilePath).text = value
+    void setSavedHistoryId(String id) {
+        new File(historyFilePath).text = id
     }
 
 }

@@ -17,12 +17,12 @@ class OrderHandlerRunner implements CommandLineRunner {
     private static final Logger LOG = LoggerFactory.getLogger(OrderHandlerRunner.class)
 
     @Autowired
-    GmailSyncManager syncManager
+    GmailSyncEngine syncManager
 
     @Override
     void run(String... args) throws Exception {
         LOG.info("OrderHandlerRunner started successfully.")
-        syncManager.scheduledSync()
+//        syncManager.scheduledSync()
     }
 
 }

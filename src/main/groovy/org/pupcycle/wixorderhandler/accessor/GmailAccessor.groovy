@@ -1,5 +1,6 @@
 package org.pupcycle.wixorderhandler.accessor
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException
 import com.google.api.services.gmail.Gmail
 import com.google.api.services.gmail.model.ListHistoryResponse
 import com.google.api.services.gmail.model.ListMessagesResponse
@@ -27,32 +28,64 @@ class GmailAccessor {
     /**
      * Gets a single message from the Gmail account by the message's id. This method is
      * required because the messages returned by {@code messages.list} don't contain a historyId.
+     *
+     * If the message id provided isn't found (such as in the case of a draft), the error will
+     * be logged and an empty optional will be returned.
+     *
      * @param id    the message id
-     * @return the message resource
+     * @return the message resource, if present
      */
-    Message getMessage(String id) {
-        Message message = gmailService.users().messages().get("me", id).execute()
-        LOG.debug("Retrieved message with {id: ${message.getId()}, historyId: ${message.getHistoryId()}}.")
-        return message
+    Optional<Message> getMessage(String id) {
+        Optional<Message> returnMessage
+
+        try {
+            Message message = gmailService.users().messages().get("me", id).execute()
+            LOG.debug("Retrieved message with {id: ${message.getId()}, historyId: ${message.getHistoryId()}}.")
+            returnMessage = Optional.of(message)
+        } catch (GoogleJsonResponseException e) {
+            if (e.details.getCode() == 404) {
+                LOG.error("Message with {id: $id} not found. It may be a draft.")
+                returnMessage = Optional.empty()
+            } else {
+                throw e
+            }
+        }
+
+        return returnMessage
     }
 
     /**
-     * Gets the id of the most recently received message in the Gmail inbox.
+     * Gets the id of the most recently added message in the Gmail inbox, or
+     * nth-most recently added message if offset is provided.
+     * @param offset    if the most recent message was a draft, the offset
+     *                  should be incremented to get the most recently received
+     *                  email
      * @return the message id
      */
-    String getMostRecentMessageId() {
-        ListMessagesResponse response = gmailService.users().messages().list("me").setMaxResults(1L).execute()
-        Message message = response.getMessages().first()
+    String getMostRecentMessageId(int offset = 0) {
+        ListMessagesResponse response = gmailService.users().messages().list("me").setMaxResults(1L + offset).execute()
+        Message message = response.getMessages().last()
         LOG.info("Retrieved most recent message id. {id: ${message.getId()}}")
         return message.getId()
     }
 
     /**
-     * Gets the history id of the most recently received message in the Gmail inbox.
+     * Gets the history id of the most recently added message in the Gmail inbox.
+     * If the most recently added message is a draft, then it retries until finding
+     * a received message.
+     *
      * @return the history id
      */
     String getMostRecentHistoryId() {
-        return getMessage(getMostRecentMessageId()).getHistoryId()
+        Optional<Message> optional = Optional.empty()
+        int offset = 0
+
+        while (!optional.isPresent()) {
+            optional = getMessage(getMostRecentMessageId(offset))
+            offset++
+        }
+
+        return optional.get().getHistoryId()
     }
 
     /**
@@ -83,7 +116,8 @@ class GmailAccessor {
 
         LOG.info("Synchronized user messages. Returned {count: ${messages.size()}} messages.")
 
-        messages = messages.collect { getMessage(it.getId()) }
+        messages = messages.collect { getMessage(it.getId()).orElse(null) }
+        messages.removeAll { it == null }
 
         return messages
     }
