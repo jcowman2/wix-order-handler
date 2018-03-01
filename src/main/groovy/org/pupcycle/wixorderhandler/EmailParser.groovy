@@ -2,7 +2,6 @@ package org.pupcycle.wixorderhandler
 
 import com.google.api.services.gmail.model.Message
 import com.google.api.services.gmail.model.MessagePart
-import com.google.api.services.gmail.model.MessagePartBody
 
 class EmailParser {
 
@@ -30,14 +29,20 @@ class EmailParser {
     /**
      * Gets decoded contents of body from email. If the email contains only one part,
      * then that data is returned. Otherwise, the data from the first part with
-     * mimeType equal to 'text/plain' is returned.
+     * mimeType equal to 'text/plain' is returned. If there are no 'text/plain' parts,
+     * then the first part is returned, regardless of mimeType.
      *
      * @param payload   the root email part
      * @return the decoded body text
      */
     private static String getBody(MessagePart payload) {
-        MessagePartBody body = (payload.getBody().getData()) ? payload.getBody()
-                : payload.getParts().find{it.getMimeType() == 'text/plain'}.getBody()
-        return new String(body.decodeData())
+        MessagePart part = (payload.getBody().getData()) ?
+                payload : //Single part body, or:
+                payload.getParts().stream()
+                        .filter{it.getMimeType() == 'text/plain'} //Text part of multipart body
+                        .findFirst()
+                        .orElse(payload.getParts().first()) //If no text part, just first part
+
+        return new String(part.getBody().decodeData())
     }
 }
