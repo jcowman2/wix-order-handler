@@ -34,12 +34,12 @@ class GmailSyncEngine {
      */
     List<Message> syncNewMessages() {
         //noinspection GroovyAssignabilityCheck
-        String historyId = historyFileAccessor.getSavedHistoryId().orElse { -> gmailAccessor.getMostRecentHistoryId() }
+        String historyId = historyFileAccessor.getSavedHistoryId().orElseGet { -> gmailAccessor.getMostRecentHistoryId() }
 
         List<Message> messages = gmailAccessor.getMessagesAddedSinceHistoryId(historyId)
 
         if (messages) {
-            historyFileAccessor.setSavedHistoryId(messages.last().getHistoryId().toString())
+            historyFileAccessor.setSavedHistoryId(messages.last().getHistoryId().toString()) //todo this isn't saving
         }
 
         return messages
