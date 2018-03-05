@@ -1,13 +1,10 @@
-package org.pupcycle.wixorderhandler
+package org.pupcycle.wixorderhandler.engine
 
 import com.google.api.services.gmail.model.Message
 import groovy.transform.CompileStatic
 import org.pupcycle.wixorderhandler.accessor.GmailAccessor
 import org.pupcycle.wixorderhandler.accessor.HistoryFileAccessor
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
 /**
@@ -18,8 +15,6 @@ import org.springframework.stereotype.Component
 @Component
 @CompileStatic
 class GmailSyncEngine {
-
-    private static final Logger LOG = LoggerFactory.getLogger(GmailSyncEngine.class)
 
     @Autowired
     GmailAccessor gmailAccessor
@@ -44,16 +39,6 @@ class GmailSyncEngine {
         historyFileAccessor.setSavedHistoryId(historyId)
 
         return messages
-    }
-
-    /**
-     * Syncs new messages on startup and every 10 seconds after.
-     * Will eventually be moved into its own class.
-     */
-    @Scheduled(initialDelay = 0L, fixedRate = 10000L)
-    void scheduledSync() {
-        LOG.info("Performing scheduled sync.")
-        syncNewMessages().each{EmailParser.parseEmail(it)}
     }
 
 }
