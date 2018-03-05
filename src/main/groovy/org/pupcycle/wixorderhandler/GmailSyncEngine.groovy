@@ -1,6 +1,7 @@
 package org.pupcycle.wixorderhandler
 
 import com.google.api.services.gmail.model.Message
+import groovy.transform.CompileStatic
 import org.pupcycle.wixorderhandler.accessor.GmailAccessor
 import org.pupcycle.wixorderhandler.accessor.HistoryFileAccessor
 import org.slf4j.Logger
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component
  * @author Joe Cowman
  */
 @Component
+@CompileStatic
 class GmailSyncEngine {
 
     private static final Logger LOG = LoggerFactory.getLogger(GmailSyncEngine.class)

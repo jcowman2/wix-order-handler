@@ -2,18 +2,33 @@ package org.pupcycle.wixorderhandler
 
 import com.google.api.services.gmail.model.Message
 import com.google.api.services.gmail.model.MessagePart
+import groovy.transform.CompileStatic
+import org.pupcycle.wixorderhandler.model.Email
 
+/**
+ * Utility for parsing Gmail messages into simpler objects.
+ *
+ * @author Joe Cowman
+ */
+@CompileStatic
 class EmailParser {
 
-    static void parseEmail(Message message) {
+    /**
+     * Parses a Gmail {@code Message} into an Email model.
+     * @param message       the message to be parsed
+     * @return the email
+     */
+    static Email parseEmail(Message message) {
         MessagePart payload = message.getPayload()
 
         String to = getHeader(payload, 'To')
         String from = getHeader(payload, 'From')
         String subject = getHeader(payload, 'Subject')
+        String date = getHeader(payload, 'Date')
 
         String body = getBody(payload)
-        System.out.println(body)
+
+        return new Email(to: to, from: from, subject: subject, date: date, body: body)
     }
 
     /**
