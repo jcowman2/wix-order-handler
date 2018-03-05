@@ -37,10 +37,9 @@ class GmailSyncEngine {
         String historyId = historyFileAccessor.getSavedHistoryId().orElseGet { -> gmailAccessor.getMostRecentHistoryId() }
 
         List<Message> messages = gmailAccessor.getMessagesAddedSinceHistoryId(historyId)
+        historyId = messages.isEmpty() ? historyId : messages.last().getHistoryId().toString()
 
-        if (messages) {
-            historyFileAccessor.setSavedHistoryId(messages.last().getHistoryId().toString()) //todo this isn't saving
-        }
+        historyFileAccessor.setSavedHistoryId(historyId)
 
         return messages
     }
