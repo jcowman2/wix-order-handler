@@ -3,7 +3,9 @@ package org.pupcycle.wixorderhandler
 import groovy.transform.CompileStatic
 import org.pupcycle.wixorderhandler.engine.EmailFilterEngine
 import org.pupcycle.wixorderhandler.engine.GmailSyncEngine
+import org.pupcycle.wixorderhandler.engine.OrderEngine
 import org.pupcycle.wixorderhandler.model.Email
+import org.pupcycle.wixorderhandler.model.Order
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,6 +30,9 @@ class EmailManager {
     @Autowired
     private EmailFilterEngine emailFilterEngine
 
+    @Autowired
+    private OrderEngine orderEngine
+
     /**
      * Syncs new messages on startup and every 10 seconds after.
      */
@@ -38,7 +43,11 @@ class EmailManager {
         List<Email> emails = gmailSyncEngine.syncEmails()
         emails = emailFilterEngine.filterEmails(emails)
 
-        System.out.println(emails)
+//        System.out.println(emails)
+
+        List<Order> orders = emails.collect { orderEngine.createOrder(it) }
+
+        System.out.println(orders)
     }
 
 }

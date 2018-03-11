@@ -1,4 +1,4 @@
-package org.pupcycle.wixorderhandler
+package org.pupcycle.wixorderhandler.util
 
 import com.google.api.services.gmail.model.Message
 import com.google.api.services.gmail.model.MessagePart
@@ -11,7 +11,7 @@ import org.pupcycle.wixorderhandler.model.Email
  * @author Joe Cowman
  */
 @CompileStatic
-class EmailParser {
+class GmailMessageReader {
 
     /**
      * Parses a Gmail {@code Message} into an Email model.

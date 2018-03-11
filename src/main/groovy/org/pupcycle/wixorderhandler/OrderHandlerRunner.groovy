@@ -25,7 +25,6 @@ class OrderHandlerRunner implements CommandLineRunner {
     @Override
     void run(String... args) throws Exception {
         LOG.info("OrderHandlerRunner started successfully.")
-//        syncManager.scheduledSync()
     }
 
 }
