@@ -2,8 +2,10 @@ package org.pupcycle.wixorderhandler.engine
 
 import com.google.api.services.gmail.model.Message
 import groovy.transform.CompileStatic
+import org.pupcycle.wixorderhandler.EmailParser
 import org.pupcycle.wixorderhandler.accessor.GmailAccessor
 import org.pupcycle.wixorderhandler.accessor.HistoryFileAccessor
+import org.pupcycle.wixorderhandler.model.Email
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -39,6 +41,15 @@ class GmailSyncEngine {
         historyFileAccessor.setSavedHistoryId(historyId)
 
         return messages
+    }
+
+    /**
+     * Calls {@code syncNewMessages} and parses each message into an {@link Email} object.
+     *
+     * @return the list of new emails
+     */
+    List<Email> syncEmails() {
+        return syncNewMessages().collect { EmailParser.parseEmail(it) }
     }
 
 }

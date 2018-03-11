@@ -35,15 +35,10 @@ class EmailManager {
     void scheduledSync() {
         LOG.info("Performing scheduled sync.")
 
-        List<Email> emails = syncEmails()
-
+        List<Email> emails = gmailSyncEngine.syncEmails()
         emails = emailFilterEngine.filterEmails(emails)
 
         System.out.println(emails)
-    }
-
-    List<Email> syncEmails() {
-        return gmailSyncEngine.syncNewMessages().collect { EmailParser.parseEmail(it) }
     }
 
 }
