@@ -26,9 +26,6 @@ class OrderEngine {
         List<String> billInfo = extractMultilineValue(b, 'Billing Information', 'Shipping Information')
         List<String> shipInfo = extractMultilineValue(b, 'Shipping Information', 'Delivery Method')
 
-        billInfo.removeIf({s -> s.startsWith('<')})
-        shipInfo.removeIf({s -> s.startsWith('<')})
-
         return new Order(
                 orderNumber: extractValue(b, 'Order #', true),
                 orderPlaced: extractValue(b, 'Order placed:'),

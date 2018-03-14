@@ -31,6 +31,7 @@ class ParseUtil {
      * given a leading and ending pattern. The returned list has no
      * empty strings or carriage returns, and spaces are inserted where
      * linebreaks do not have succeeding whitespace.
+     * Values surrounded by <...> are removed.
      * @param text          the text from which the value is returned
      * @param lead          the leading pattern before the desired value.
      *                      Will not be included in the returned value.
@@ -43,7 +44,9 @@ class ParseUtil {
     static List<String> extractMultilineValue(String text, String lead, String tail, boolean isRequired = true) {
         String pattern = /(?ms)${lead}(.*)${tail}/
         String value = possibleMatch(text =~ pattern, isRequired)
-        String cleanedValue = value.replaceAll('\r\n', '\n').replaceAll('\n(\\S)', '\n $1')
+        String cleanedValue = value.replaceAll('\r\n', '\n')
+                                   .replaceAll('\n(\\S)', '\n $1')
+                                   .replaceAll('<.*>', '')
         return cleanedValue.split('\n').findAll { !it.isAllWhitespace() }*.trim()
     }
 
