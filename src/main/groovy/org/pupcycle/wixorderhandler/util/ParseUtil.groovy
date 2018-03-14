@@ -28,7 +28,9 @@ class ParseUtil {
 
     /**
      * Extracts a multiline value in the form of a list from the text,
-     * given a leading and ending pattern. Returns a list with no empty strings.
+     * given a leading and ending pattern. The returned list has no
+     * empty strings or carriage returns, and spaces are inserted where
+     * linebreaks do not have succeeding whitespace.
      * @param text          the text from which the value is returned
      * @param lead          the leading pattern before the desired value.
      *                      Will not be included in the returned value.
@@ -41,7 +43,8 @@ class ParseUtil {
     static List<String> extractMultilineValue(String text, String lead, String tail, boolean isRequired = true) {
         String pattern = /(?ms)${lead}(.*)${tail}/
         String value = possibleMatch(text =~ pattern, isRequired)
-        return value.split('\n').findAll { !it.isAllWhitespace() }
+        String cleanedValue = value.replaceAll('\r\n', '\n').replaceAll('\n(\\S)', '\n $1')
+        return cleanedValue.split('\n').findAll { !it.isAllWhitespace() }*.trim()
     }
 
     /**

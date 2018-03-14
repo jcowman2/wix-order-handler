@@ -33,13 +33,13 @@ class OrderEngine {
                 orderNumber: extractValue(b, 'Order #', true),
                 orderPlaced: extractValue(b, 'Order placed:'),
                 emailAddress: billInfo.last(),
-                billingInfo: billInfo,
+                billingInfo: billInfo.subList(0, billInfo.size() - 1),
                 shippingInfo: shipInfo,
                 subtotal: extractValue(b, 'Subtotal'),
                 shipping: extractValue(b, 'Shipping'),
                 tax: extractValue(b, 'Tax'),
                 total: extractValue(b, 'Total cost:'),
-                buyerNote: extractMultilineValue(b, '\\*Note from buyer:\\*', 'Subtotal', false).join('')
+                buyerNote: extractMultilineValue(b, '\\*Note from buyer:\\*', 'Subtotal', false).join(' ')
         )
     }
 
