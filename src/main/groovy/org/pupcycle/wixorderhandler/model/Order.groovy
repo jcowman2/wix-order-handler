@@ -22,6 +22,7 @@ class Order {
 
     String subtotal
     String shipping
+    String discount
     String tax
     String total
 

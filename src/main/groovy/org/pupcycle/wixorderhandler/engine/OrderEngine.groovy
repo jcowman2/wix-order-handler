@@ -34,6 +34,7 @@ class OrderEngine {
                 shippingInfo: shipInfo,
                 subtotal: extractValue(b, 'Subtotal'),
                 shipping: extractValue(b, 'Shipping'),
+                discount: extractValue(b, 'Discount', false, false),
                 tax: extractValue(b, 'Tax'),
                 total: extractValue(b, 'Total cost:'),
                 buyerNote: extractMultilineValue(b, '\\*Note from buyer:\\*', 'Subtotal', false).join(' ')

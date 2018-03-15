@@ -31,6 +31,7 @@ class ParseUtil {
      * given a leading and ending pattern. The returned list has no
      * empty strings or carriage returns, and spaces are inserted where
      * linebreaks do not have succeeding whitespace.
+     * Commas at the ends of lines are removed.
      * Values surrounded by <...> are removed.
      * @param text          the text from which the value is returned
      * @param lead          the leading pattern before the desired value.
@@ -47,6 +48,7 @@ class ParseUtil {
         String cleanedValue = value.replaceAll('\r\n', '\n')
                                    .replaceAll('\n(\\S)', '\n $1')
                                    .replaceAll('<.*>', '')
+                                   .replaceAll(',\n', '\n')
         return cleanedValue.split('\n').findAll { !it.isAllWhitespace() }*.trim()
     }
 
@@ -63,7 +65,7 @@ class ParseUtil {
             return m[0][1]
         } catch (IndexOutOfBoundsException e) {
             if (required) {
-                throw e
+                throw new RuntimeException('No match found.', e) //todo more specific exception
             } else {
                 return ''
             }
