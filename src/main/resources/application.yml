@@ -20,3 +20,7 @@ logging:
 
 history:
   path: ${HISTORY_PATH}
+
+filter:
+  expected-sender: contact@pupcycle.org
+  expected-subject: NICE! YOU JUST GOT AN ORDER
