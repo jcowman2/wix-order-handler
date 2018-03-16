@@ -28,5 +28,5 @@ class Order {
 
     String buyerNote
 
-    //Todo multiple order contents
+    List<OrderItem> orderItems
 }

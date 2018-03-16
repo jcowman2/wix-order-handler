@@ -1,6 +1,6 @@
 package org.pupcycle.wixorderhandler.util
 
-import java.util.regex.Matcher
+import org.pupcycle.wixorderhandler.exception.NoMatchFoundException
 
 /**
  * Contains utility methods for extracting data from email body text using Regex.
@@ -8,6 +8,8 @@ import java.util.regex.Matcher
  * @author Joe Cowman
  */
 class ParseUtil {
+
+    private static int errorTextLength = 500
 
     /**
      * Extracts a value from a single line of the text, given a leading pattern.
@@ -23,7 +25,7 @@ class ParseUtil {
      */
     static String extractValue(String text, String lead, boolean requireNumeric = false, boolean isRequired = true) {
         String pattern = /(?m)^${lead}\s*(${requireNumeric ? /\d/ : /./}*)/
-        return possibleMatch(text =~ pattern, isRequired)
+        return possibleMatch(text, pattern, isRequired)
     }
 
     /**
@@ -44,7 +46,7 @@ class ParseUtil {
      */
     static List<String> extractMultilineValue(String text, String lead, String tail, boolean isRequired = true) {
         String pattern = /(?ms)${lead}(.*)${tail}/
-        String value = possibleMatch(text =~ pattern, isRequired)
+        String value = possibleMatch(text, pattern, isRequired)
         String cleanedValue = value.replaceAll('\r\n', '\n')
                                    .replaceAll('\n(\\S)', '\n $1')
                                    .replaceAll('<.*>', '')
@@ -56,16 +58,18 @@ class ParseUtil {
      * Returns the first matching value from the matcher, if exists.
      * If not, and {@code required} is true, an exception will be thrown.
      * Otherwise, an empty string will be returned.
-     * @param m             the matcher
+     * @param text          the text
+     * @param pattern       the regex pattern
      * @param required      whether the match is required
      * @return  the matched value, if exists
      */
-    static String possibleMatch(Matcher m, boolean required) {
+    static String possibleMatch(String text, String pattern, boolean required) {
         try {
-            return m[0][1]
+            return (text =~ pattern)[0][1]
         } catch (IndexOutOfBoundsException e) {
             if (required) {
-                throw new RuntimeException('No match found.', e) //todo more specific exception
+                String textPreview = text.length() > errorTextLength ? "${text.take(errorTextLength)}..." : text
+                throw new NoMatchFoundException("No match found: {pattern: $pattern, text: $textPreview}", e)
             } else {
                 return ''
             }
