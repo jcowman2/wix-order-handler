@@ -1,7 +1,10 @@
 package org.pupcycle.wixorderhandler
 
+import groovy.transform.CompileStatic
+import org.pupcycle.wixorderhandler.engine.GmailSyncEngine
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
 
@@ -11,9 +14,13 @@ import org.springframework.stereotype.Component
  * @author Joe Cowman
  */
 @Component
+@CompileStatic
 class OrderHandlerRunner implements CommandLineRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrderHandlerRunner.class)
+
+    @Autowired
+    GmailSyncEngine syncManager
 
     @Override
     void run(String... args) throws Exception {
