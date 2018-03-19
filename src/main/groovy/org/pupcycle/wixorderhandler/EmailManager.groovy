@@ -5,6 +5,7 @@ import groovy.transform.CompileStatic
 import org.pupcycle.wixorderhandler.engine.EmailFilterEngine
 import org.pupcycle.wixorderhandler.engine.GmailSyncEngine
 import org.pupcycle.wixorderhandler.engine.OrderEngine
+import org.pupcycle.wixorderhandler.engine.RecordOrderEngine
 import org.pupcycle.wixorderhandler.model.Email
 import org.pupcycle.wixorderhandler.model.Order
 import org.slf4j.Logger
@@ -34,11 +35,14 @@ class EmailManager {
     @Autowired
     private OrderEngine orderEngine
 
+    @Autowired
+    private RecordOrderEngine recordOrderEngine
+
     /**
      * Syncs new messages on startup and every 10 seconds after.
      */
-//    @Scheduled(initialDelay = 0L, fixedRate = 10000L)
-    @Scheduled(initialDelay = 0L, fixedRate = 1000000000000L) //todo revert
+    @Scheduled(initialDelay = 0L, fixedRate = 10000L)
+//    @Scheduled(initialDelay = 0L, fixedRate = 1000000000000L) //todo revert
     void scheduledSync() {
         LOG.info("Performing scheduled sync.")
 
@@ -50,6 +54,8 @@ class EmailManager {
         List<Order> orders = emails.collect { orderEngine.createOrder(it) }
 
         System.out.println(JsonOutput.prettyPrint(JsonOutput.toJson(orders)))
+
+        orders.each { recordOrderEngine.recordOrder(it) }
     }
 
 }

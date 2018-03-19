@@ -24,3 +24,7 @@ history:
 filter:
   expected-sender: contact@pupcycle.org
   expected-subject: NICE! YOU JUST GOT AN ORDER
+
+spreadsheet:
+  id: ${SPREADSHEET_ID}
+  name: ${SPREADSHEET_NAME}
