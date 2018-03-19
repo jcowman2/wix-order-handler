@@ -6,6 +6,8 @@ import org.pupcycle.wixorderhandler.accessor.SheetsAccessor
 import org.pupcycle.wixorderhandler.config.SpreadsheetInfo
 import org.pupcycle.wixorderhandler.model.Order
 import org.pupcycle.wixorderhandler.model.OrderSpreadsheetEntryFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -18,11 +20,13 @@ import org.springframework.stereotype.Component
 @CompileStatic
 class RecordOrderEngine {
 
-    SheetsAccessor sheetsAccessor
-    OrderSpreadsheetEntryFactory entryFactory
-    SpreadsheetInfo sheetInfo
+    private static final Logger LOG = LoggerFactory.getLogger(RecordOrderEngine.class)
 
-    String range
+    private SheetsAccessor sheetsAccessor
+    private OrderSpreadsheetEntryFactory entryFactory
+    private SpreadsheetInfo sheetInfo
+
+    private String range
 
     /**
      * Constructs a RecordOrderEngine.
@@ -47,6 +51,7 @@ class RecordOrderEngine {
                 sheetInfo.spreadsheetId,
                 "${sheetInfo.sheetName}!$range",
                 getValueRange(entryFactory.toEntry(order)))
+        LOG.info("Recorded order {number: ${order.orderNumber}} in spreadsheet {name: ${sheetInfo.sheetName}}.")
     }
 
     /**
@@ -72,7 +77,7 @@ class RecordOrderEngine {
             s = c.toString() + s
             length /= 26
         }
-        return "A1:${s}1"
+        return 'A1:' + s + '1'
     }
 
 }

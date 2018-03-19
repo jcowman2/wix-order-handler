@@ -1,4 +1,4 @@
-package org.pupcycle.wixorderhandler.engine
+package org.pupcycle.wixorderhandler.util
 
 import org.pupcycle.wixorderhandler.exception.NoMatchFoundException
 import org.pupcycle.wixorderhandler.model.Email
@@ -6,7 +6,6 @@ import org.pupcycle.wixorderhandler.model.Order
 import org.pupcycle.wixorderhandler.model.OrderItem
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
 
 import static org.pupcycle.wixorderhandler.util.ParseUtil.extractMultilineValue
 import static org.pupcycle.wixorderhandler.util.ParseUtil.extractValue
@@ -16,23 +15,22 @@ import static org.pupcycle.wixorderhandler.util.ParseUtil.extractValue
  *
  * @author Joe Cowman
  */
-@Component
-class OrderEngine {
+class OrderBuilder {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OrderEngine.class)
+    private static final Logger LOG = LoggerFactory.getLogger(OrderBuilder.class)
 
     /**
      * Create an order given a Wix order email
      * @param email     the Wix email
      * @return an order with parsed info
      */
-    Order createOrder(Email email) {
+    static Order createOrder(Email email) {
         String b = email.getBody()
 
         List<String> billInfo = extractMultilineValue(b, 'Billing Information', 'Shipping Information')
         List<String> shipInfo = extractMultilineValue(b, 'Shipping Information', 'Delivery Method')
 
-        return new Order(
+        Order order = new Order(
                 orderNumber: extractValue(b, 'Order #', true),
                 orderPlaced: extractValue(b, 'Order placed:'),
                 emailAddress: billInfo.last(),
@@ -46,6 +44,9 @@ class OrderEngine {
                 buyerNote: extractMultilineValue(b, '\\*Note from buyer:\\*', 'Subtotal', false).join(' '),
                 orderItems: createOrderItems(b)
         )
+
+        LOG.info("Generated order {number: ${order.orderNumber}}.")
+        return order
     }
 
     /**
@@ -53,7 +54,7 @@ class OrderEngine {
      * @param messageBody   the message body
      * @return  a list of order items
      */
-    List<OrderItem> createOrderItems(String messageBody) {
+    static List<OrderItem> createOrderItems(String messageBody) {
         List<String> orderDetails
         try {
             orderDetails = extractMultilineValue(messageBody, 'Item Qty Total', '\\*Note from buyer:\\*')

@@ -17,7 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 class WixOrderHandlerApplication {
 
 	static void main(String[] args) {
-		SpringApplication.run WixOrderHandlerApplication, args
+		SpringApplication.run(WixOrderHandlerApplication, args)
 	}
 
 }

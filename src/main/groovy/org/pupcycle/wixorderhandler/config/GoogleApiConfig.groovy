@@ -15,6 +15,8 @@ import com.google.api.services.gmail.GmailScopes
 import com.google.api.services.sheets.v4.Sheets
 import com.google.api.services.sheets.v4.SheetsScopes
 import groovy.transform.CompileStatic
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -27,6 +29,8 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @CompileStatic
 class GoogleApiConfig {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GoogleApiConfig.class)
 
     private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance()
 
@@ -95,7 +99,7 @@ class GoogleApiConfig {
                 new LocalServerReceiver.Builder().setPort(port).build())
                 .authorize("user")
 
-        System.out.println("Credentials saved to " + dataStoreDir().getAbsolutePath())
+        LOG.info("Credentials saved to " + dataStoreDir().getAbsolutePath())
 
         return credential
     }
