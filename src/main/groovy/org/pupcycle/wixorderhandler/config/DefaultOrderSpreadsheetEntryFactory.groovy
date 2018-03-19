@@ -46,7 +46,7 @@ class DefaultOrderSpreadsheetEntryFactory implements OrderSpreadsheetEntryFactor
         OrderItem largeToy = order.orderItems.find { it.name == 'Large Rope Dog Toy' }
         return [
                 order.orderNumber,
-                order.orderPlaced,
+                order.orderPlaced, //todo this isn't formatting properly
                 'TODO',
                 '',
                 smallToy?.quantity ?: '0',
@@ -56,13 +56,13 @@ class DefaultOrderSpreadsheetEntryFactory implements OrderSpreadsheetEntryFactor
                 order.buyerNote,
                 order.subtotal,
                 order.shipping,
-                order.discount ?: '0',
+                order.discount ?: '$0.00',
                 order.tax,
                 order.total,
-                '',
-                '',
-                '',
-                '', //todo calculate net profit
+                '$0.00',
+                '$0.00',
+                '$0.00',
+                '=N:N+O:O+P:P+Q:Q',
                 order.emailAddress,
                 order.billingInfo.join('  '),
                 order.shippingInfo.join('  ')
