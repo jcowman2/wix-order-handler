@@ -46,7 +46,7 @@ class DefaultOrderSpreadsheetEntryFactory implements OrderSpreadsheetEntryFactor
         OrderItem largeToy = order.orderItems.find { it.name == 'Large Rope Dog Toy' }
         return [
                 order.orderNumber,
-                order.orderPlaced, //todo this isn't formatting properly
+                order.orderPlaced, //If this is showing as an integer, set format to date
                 'TODO',
                 '',
                 smallToy?.quantity ?: '0',
