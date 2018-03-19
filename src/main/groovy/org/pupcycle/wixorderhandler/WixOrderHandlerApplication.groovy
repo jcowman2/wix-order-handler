@@ -3,7 +3,6 @@ package org.pupcycle.wixorderhandler
 import groovy.transform.CompileStatic
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.cloud.netflix.feign.EnableFeignClients
 import org.springframework.scheduling.annotation.EnableScheduling
 
 /**
@@ -14,7 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling
  */
 @CompileStatic
 @SpringBootApplication
-@EnableFeignClients
 @EnableScheduling
 class WixOrderHandlerApplication {
 

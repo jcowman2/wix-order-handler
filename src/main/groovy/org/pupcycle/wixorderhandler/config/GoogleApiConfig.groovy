@@ -12,23 +12,25 @@ import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.client.util.store.FileDataStoreFactory
 import com.google.api.services.gmail.Gmail
 import com.google.api.services.gmail.GmailScopes
+import com.google.api.services.sheets.v4.Sheets
+import com.google.api.services.sheets.v4.SheetsScopes
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 /**
- * Contains all configuration necessary to build and return an authorized Gmail service.
+ * Contains all configuration necessary to build and return authorized Google API services.
  *
  * @author Joe Cowman
  */
 @Configuration
 @CompileStatic
-class GmailConfig {
+class GoogleApiConfig {
 
     private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance()
 
-    private final List<String> SCOPES = Arrays.asList(GmailScopes.GMAIL_LABELS, GmailScopes.GMAIL_READONLY) //If modified, delete previous credentials
+    private final List<String> SCOPES = Arrays.asList(GmailScopes.GMAIL_READONLY, SheetsScopes.SPREADSHEETS) //If modified, delete previous credentials
 
     @Value('${spring.application.name}')
     private String applicationName
@@ -101,12 +103,23 @@ class GmailConfig {
     /**
      * Build and return an authorized Gmail client service.
      * @return an authorized Gmail client service
-     * @throws IOException
      */
     @Bean
-    Gmail getGmailService() throws IOException {
+    Gmail getGmailService() {
         Credential credential = authorize()
         return new Gmail.Builder(httpTransport(), JSON_FACTORY, credential)
+                .setApplicationName(applicationName)
+                .build()
+    }
+
+    /**
+     * Build and return an authorized Sheets client service
+     * @return an authorized Sheets client service
+     */
+    @Bean
+    Sheets getSheetsService() {
+        Credential credential = authorize()
+        return new Sheets.Builder(httpTransport(), JSON_FACTORY, credential)
                 .setApplicationName(applicationName)
                 .build()
     }
